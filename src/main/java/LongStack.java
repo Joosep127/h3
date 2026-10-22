@@ -5,6 +5,7 @@ public class LongStack {
    LongStack return_stack = null;
 
    public static void main(String[] argum) {
+      System.out.println(LongStack.interpret(">R 3 R@ * - R> -"));
    }
 
    private class Node {
@@ -148,15 +149,24 @@ public class LongStack {
       String[] tokens = pol.trim().split("\\s+");
 
       for (String token : tokens) {
-         if (token.equals("R<")) {
-            stack.return_stack.push(stack.pop());
-         }
-
-         else if (token.equals("R>")) {
+         if (token.equals("R>")) {
+            if (stack.return_stack.stEmpty()) {
+               throw new RuntimeException("Symbol R> called but Return stack is empty");
+            }
             stack.push(stack.return_stack.pop());
          }
 
+         else if (token.equals(">R")) {
+            if (stack.stEmpty()) {
+               throw new RuntimeException("Symbol >R called but stack is empty");
+            }
+            stack.return_stack.push(stack.pop());
+         }
+
          else if (token.equals("R@")) {
+            if (stack.return_stack.stEmpty()) {
+               throw new RuntimeException("Symbol R@ called but Return stack is empty");
+            }
             stack.push(stack.return_stack.current.value);
          }
 

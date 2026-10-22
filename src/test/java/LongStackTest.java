@@ -273,6 +273,90 @@ public class LongStackTest {
    public void testTooFewNumbers3() {
       LongStack.interpret ("+");
    }
+   @Test
+   public void testPushAndPopReturnStack() {
+      assertEquals("Popping from return stack should restore pushed value",
+              5L, LongStack.interpret("5 >R R>"));
+   }
 
+   @Test(expected = RuntimeException.class)
+   public void testPopFromEmptyReturnStack() {
+      LongStack.interpret("R>");
+   }
+
+   @Test(expected = RuntimeException.class)
+   public void testPopTwiceFromReturnStack() {
+      LongStack.interpret("5 >R R> R>");
+   }
+
+   @Test(expected = RuntimeException.class)
+   public void testCopyEmptyReturnStack() {
+      LongStack.interpret("R@");
+   }
+
+   @Test(expected = RuntimeException.class)
+   public void testCopyAfterPopFromReturnStack() {
+      LongStack.interpret("5 >R R> R@");
+   }
+
+   @Test
+   public void testSubtractUsingReturnStack() {
+      String input = "15 7 3 >R - R> -";
+      String decoded = "15 7 - 3 -";
+
+      assertEquals("Return stack ops should produce the same result as decoded expression",
+              LongStack.interpret(decoded), LongStack.interpret(input));
+      assertEquals("Subtraction using return stack should produce 5",
+              5L, LongStack.interpret(input));
+   }
+
+   @Test
+   public void testCopyDoesNotRemoveReturnStackValue() {
+      String input = "2 5 >R 3 R@ * - R> -";
+      String decoded = "2 3 5 * - 5 -";
+
+      assertEquals("Copying from return stack should preserve original value",
+              LongStack.interpret(decoded), LongStack.interpret(input));
+      assertEquals("Copying and popping should produce -18",
+              -18L, LongStack.interpret(input));
+   }
+
+   @Test
+   public void testPushTwoThenPopInLifoOrder() {
+      String input = "1 2 >R 3 >R R> R> - -";
+      String decoded = "1 3 2 - -";
+
+      assertEquals("Return stack should pop values in LIFO order",
+              LongStack.interpret(decoded), LongStack.interpret(input));
+      assertEquals("Popping two values in LIFO order should produce 2",
+              0, LongStack.interpret(input));
+   }
+
+   @Test
+   public void testMultipleCopysDoNotRemoveValue() {
+      String input = "10 >R R@ R@ + R> -";
+      String decoded = "10 10 + 10 -";
+
+      assertEquals("Multiple copies should not remove value from return stack",
+              LongStack.interpret(decoded), LongStack.interpret(input));
+      assertEquals("Copying twice and then popping should produce 10",
+              10L, LongStack.interpret(input));
+   }
+
+   @Test
+   public void testPopThenCopyNextReturnStackValue() {
+      String input = "4 >R 7 >R R> R@ - R> -";
+      String decoded = "7 4 - 4 -";
+
+      assertEquals("Copying after a pop should access next value on return stack",
+              LongStack.interpret(decoded), LongStack.interpret(input));
+      assertEquals("Popping and copying next value should produce -1",
+              -1L, LongStack.interpret(input));
+   }
+
+   @Test(expected = RuntimeException.class)
+   public void testReturnStackEmptyAtEnd() {
+      LongStack.interpret("5 5 >R R@ +");
+   }
 }
 
