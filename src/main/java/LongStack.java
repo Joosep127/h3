@@ -2,6 +2,7 @@
 public class LongStack {
 
    Node current = null;
+   LongStack return_stack = null;
 
    public static void main(String[] argum) {
    }
@@ -142,11 +143,24 @@ public class LongStack {
       }
 
       LongStack stack = new LongStack();
+      stack.return_stack = new LongStack();
 
       String[] tokens = pol.trim().split("\\s+");
 
       for (String token : tokens) {
-         if (token.equals("+") ||
+         if (token.equals("R<")) {
+            stack.return_stack.push(stack.pop());
+         }
+
+         else if (token.equals("R>")) {
+            stack.push(stack.return_stack.pop());
+         }
+
+         else if (token.equals("R@")) {
+            stack.push(stack.return_stack.current.value);
+         }
+
+         else if (token.equals("+") ||
                  token.equals("-") ||
                  token.equals("*") ||
                  token.equals("/")) {
@@ -165,6 +179,10 @@ public class LongStack {
 
       if (stack.stEmpty()) {
          throw new RuntimeException("No result");
+      }
+
+      if (!stack.return_stack.stEmpty()) {
+         throw new RuntimeException("Return Stack isn't empty");
       }
 
       long result = stack.pop();
