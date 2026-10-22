@@ -2,7 +2,7 @@
 public class LongStack {
 
    Node current = null;
-   LongStack return_stack = new LongStack();
+   LongStack return_stack = null;
 
    public static void main(String[] argum) {
    }
@@ -143,6 +143,7 @@ public class LongStack {
       }
 
       LongStack stack = new LongStack();
+      stack.return_stack = new LongStack();
 
       String[] tokens = pol.trim().split("\\s+");
 
@@ -178,6 +179,10 @@ public class LongStack {
 
       if (stack.stEmpty()) {
          throw new RuntimeException("No result");
+      }
+
+      if (!stack.return_stack.stEmpty()) {
+         throw new RuntimeException("Return Stack isn't empty");
       }
 
       long result = stack.pop();
